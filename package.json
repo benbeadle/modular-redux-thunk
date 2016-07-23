@@ -1,0 +1,33 @@
+{
+  "name": "modular-redux-thunk",
+  "version": "0.0.2",
+  "description": "A ducks-inspired package to help organize actions, reducers, and selectors together.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/benbeadle/modular-redux-thunk.git"
+  },
+  "keywords": [
+    "redux",
+    "thunk",
+    "ducks",
+    "react",
+    "reducers",
+    "store"
+  ],
+  "author": "Ben Beadle <ben@benbeadle.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/benbeadle/modular-redux-thunk/issues"
+  },
+  "homepage": "https://github.com/benbeadle/modular-redux-thunk#readme",
+  "dependencies": {
+    "react-router-redux": "^4.0.5",
+    "redux": "^3.5.2",
+    "redux-freeze": "^0.1.4",
+    "redux-thunk": "^2.1.0"
+  }
+}
