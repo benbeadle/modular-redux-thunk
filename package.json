@@ -1,6 +1,6 @@
 {
   "name": "modular-redux-thunk",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A ducks-inspired package to help organize actions, reducers, and selectors together.",
   "main": "src/index.js",
   "scripts": {
