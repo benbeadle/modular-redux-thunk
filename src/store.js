@@ -8,8 +8,8 @@ import combineActions, { pickActionsWrapper } from './actions.js';
 export default (reducerData, { globalSelectors={}, globalActions={} }={}) => {
 
   const reducers = {};
-  const selectors = {};
-  const actions = {};
+  const reducerSelectors = {};
+  const reducerActions = {};
 
   Object.keys(reducerData).map(name => {
     reducers[name] = reducerData[name]['reducer'];
@@ -21,13 +21,13 @@ export default (reducerData, { globalSelectors={}, globalActions={} }={}) => {
   // This is also where react-router-redux is included
   const rootReducer = combineReducers(reducers, {
     routing: routing
-  }));
+  });
 
   // Combine all reducer's selectors and any global selectors into one.
-  const selectors = combineSelectors(selectors, globalSelectors);
+  const selectors = combineSelectors(reducerSelectors, globalSelectors);
 
   // Combine all actions and return the action props creator function
-  const actions = combineActions(actions, globalActions);
+  const actions = combineActions(reducerActions, globalActions);
   const pickActions = pickActionsWrapper(actions);
 
   // Thunk allows us to create async actions.
