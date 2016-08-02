@@ -6,21 +6,18 @@ import combineActions, { pickActionsWrapper } from './actions.js';
 export default (reducerData, globalReducerData={}, reduxConfig={}) => {
   console.log(reduxConfig);
 
-  const reducers = {};
   const reducerSelectors = {};
   const reducerActions = {};
 
   Object.keys(reducerData).map(name => {
     reducers[name] = reducerData[name]['reducer'];
-    selectors[name] = reducerData[name]['selectors'];
-    actions[name] = reducerData[name]['actions'];
+    reducerSelectors[name] = reducerData[name]['selectors'];
+    reducerActions[name] = reducerData[name]['actions'];
   });
 
   // Create the root reducer which combines all other reducers.
   // This is also where react-router-redux is included
-  const rootReducer = combineReducers(reducers, {
-    routing: routing
-  });
+  const rootReducer = combineReducers(reducers);
 
   // Combine all reducer's selectors and any global selectors into one.
   const selectors = combineSelectors(reducerSelectors, globalSelectors);
