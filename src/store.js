@@ -1,11 +1,10 @@
 import { combineReducers, createStore, applyMiddleware, compose } from 'redux';
-import { routerReducer as routing } from 'react-router-redux';
-import thunk from 'redux-thunk';
 
 import combineSelectors from './selectors.js';
 import combineActions, { pickActionsWrapper } from './actions.js';
 
-export default (reducerData, { globalSelectors={}, globalActions={} }={}) => {
+export default (reducerData, globalReducerData={}, reduxConfig={}) => {
+  console.log(reduxConfig);
 
   const reducers = {};
   const reducerSelectors = {};
