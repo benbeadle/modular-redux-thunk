@@ -17,7 +17,7 @@ A [ducks](https://github.com/erikras/ducks-modular-redux)-inspired package to he
 
 `npm install --save modular-redux-thunk redux`
 
-```
+```js
 import createStore from 'modular-redux-thunk';
 
 const { store, pickActions, selectors } = createStore(myModularReduxDefinition);
@@ -30,7 +30,7 @@ npm install --save react-router
 npm install --save-dev redux-freeze
 ```
 
-```
+```js
 import createStore from 'modular-redux-thunk';
 import { routerReducer } from 'react-router-redux';
 import reduxFreeze from 'redux-freeze';
@@ -52,7 +52,7 @@ Let's say your app will be storing the following information in the state:
 * The logged-in-user's favorite drink
 
 `reducers/chips.js`
-```
+```js
 const actions = {};
 const reducers = {};
 const selectors = {};
@@ -92,7 +92,7 @@ export default { actions, reducers, selectors };
 ```
 
 `reducers/drinks.js`
-```
+```js
 const actions = {};
 const reducers = {};
 const selectors = {};
@@ -132,7 +132,7 @@ export default { actions, reducers, selectors };
 ```
 
 `reducers/selectors.js`
-```
+```js
 export const getUserFavorites = (selectors, state) => {
   return {
     chips: selectors.getFavoriteChips(state),
@@ -142,7 +142,7 @@ export const getUserFavorites = (selectors, state) => {
 ```
 
 `reducers/actions.js`
-```
+```js
 export const setUserFavorites = (actions, favChips, favDrink) => {
   return function(dispatch) {
     dispatch(actions.setFavoriteChips(favChips));
@@ -152,7 +152,7 @@ export const setUserFavorites = (actions, favChips, favDrink) => {
 ```
 
 `reducers/index.js`
-```
+```js
 import createStore from 'modular-redux-thunk';
 
 import chips from './chips.js';
@@ -172,7 +172,7 @@ export { store, selectors, pickActions };
 ```
 
 `app.js`
-```
+```js
 import React from 'react';
 import { Provider, connect } from 'react-redux';
 import { store, selectors, pickActions } from './reducers';
