@@ -4,7 +4,8 @@ var expect = require('chai').expect;
 // Define a reducer (typically would be in reducers/chips.js)
 var chips = {
   reducers: {
-    favorite: (state = 'unknown', action) => {
+    favorite: (state, action) => {
+      state = state || 'unknown';
       switch(action.type) {
         case 'SET_FAVORITE_CHIPS': return action.newFav;
         default: return state;
