@@ -240,8 +240,7 @@ Create's a Redux store that combines your reducers into a single and complete st
 #### Releasing
 ```
 Commit all changes
-npm test
-npm run build
+npm run build -> test && clean:build && build && test:build
 npm version "v1.0.0-beta1" -m "Message"
 npm publish
 git push origin HEAD:master --tags
