@@ -4,7 +4,8 @@
   "description": "A ducks-inspired package to help organize actions, reducers, and selectors together.",
   "main": "lib/index.js",
   "scripts": {
-    "build": "npm test && npm run clean:build && babel src --presets es2015 --out-dir lib",
+    "build": "npm test && npm run clean:build && babel src --presets es2015 --out-dir lib && npm run test:build",
+    "!!build:specs": "npm run build && babel specs --presets es2015,react --out-dir lib/specs",
     "clean:build": "rm -rf lib",
     "test": "BABEL_ENV=test mocha --compilers js:babel-core/register ./specs/src/**/*.spec.js",
     "test:build": "mocha ./specs/build/**/*.spec.js",
