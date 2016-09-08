@@ -1,0 +1,15 @@
+language: node_js
+node_js:
+  - "6"
+  - "4"
+  - "5"
+script:
+  - npm test
+deploy:
+  provider: npm
+  email: ben@benbeadle.com
+  api_key:
+    secure: Oi+2GmI0yywTOr9m8S9oN5K9HRfxK7wPeKUld+NaGxXStUKU8pGSBw2PYnnmWIZGmn+x/cGpzJZBcOlQLXrnF7aUmiV+U32cCkZG8I4bRTRa+FLSz2jRdlUAv3UDCz2NqHrFNsqpF/dqVrsEcx9y9Lxf34fUJEYGLLKScXortfVybs3jeGZRmLRx6SB7E7KDIDabIEeVU/hgQdZgp5MTp/PBo04ut8k9hHlP2QTB0CjtPeGFvwywuSoGeiykLiDRdWi7vFKmFwhGeHc/VRoq9i3Cx0oYZykVyG3FHGwiiT+G+I2gt6fzVOSf16arCQ8mu20FqlrAwBprrqP+8FXwXomzQVupQa4Wv+QnGrclswGjtGpjEyeKJt1mXAQPF6vK83k21Xg4mgc+vrJWkNmhFlCDPNoczyV2qBCGvZcSsbPLgJjv3x9ipCNnJwaHIei4m7h+lHo0l9V69DawHrZM/BIwlWLQSj9qNK0XQbSZVPpJPId4Z9TlPeECDZB6/tBj4QtAV2VBFB/QErP1tBSw/LHR9hX2qYaOj164e4Eb1C/etBWSM8jef07uTNUjLeZDaEfGZ3KvpowndqZ32+TNKpdVvYuOsl87/ygCGzmguCBkqPMuvFeEtORxNJ2Sa+sdJUjk7Ra+tgSKI5NpCmqdaQXXU/g1WuM+O1gYLsfvUCw=
+  on:
+    repo: benbeadle/modular-redux-thunk
+    branch: master
