@@ -241,8 +241,8 @@ Create's a Redux store that combines your reducers into a single and complete st
 ```
 Commit all changes
 npm test
-Build (clean, build, test:build)
-npm version premajor #v1.0.0-beta1
+npm run build
+npm version "v1.0.0-beta1" -m "Message"
 npm publish
 git push origin HEAD:master --tags
 # Update Changelog
