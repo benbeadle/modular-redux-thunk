@@ -78,7 +78,7 @@ describe('createStore', function() {
 
     expect(store.getState()).to.deep.equal({chips:{favorite:''}});
 
-    expectObjKeysToDeepEqual(actions, ['setFavoriteChips']);
+    expectObjKeysToDeepEqual(actions, ['setFavoriteChips', 'setFavChipsAsync']);
     expectObjKeysToDeepEqual(selectors, ['getFavoriteChips']);
 
     const myActions = pickActions('setFavoriteChips');
@@ -88,7 +88,7 @@ describe('createStore', function() {
     expect(store.getState()).to.deep.equal({chips:{favorite:'bbq'}});
   });
 
-  it('should allow async actions', function() {
+  it('should allow async actions (redux-thunk)', function() {
     const chips = getChipsReducer();
     const { store, selectors, actions, pickActions } = createStore(chips);
 
@@ -326,8 +326,6 @@ describe('createStore', function() {
     const { store } = createStore({chips, drinks});
     expect(store.getState()).to.deep.equal({chips:{}});
   });
-
-  it('should include redux-thunk middleware');
 
   it('should include redux-freeze when not in production');
   it('should not include redux-freeze when in production');
