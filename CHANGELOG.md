@@ -1,4 +1,8 @@
 
+## v1.0.0-beta4
+* Fixed bug with devToolsExtension not being added to the enhancers last.
+* Moved over a handful of packages to dependencies so they are installed.
+
 ## v1.0.0-beta3
 * Fixed `npm publish` issue.
 

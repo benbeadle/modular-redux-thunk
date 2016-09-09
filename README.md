@@ -15,7 +15,7 @@ A [ducks](https://github.com/erikras/ducks-modular-redux)-inspired package to he
 
 # Installation
 
-`npm install --save modular-redux-thunk redux`
+`npm install --save modular-redux-thunk`
 
 ```js
 import createStore from 'modular-redux-thunk';
