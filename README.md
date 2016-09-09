@@ -27,19 +27,17 @@ You can also include custom reducers, middleware, or enhancers. For example, if 
 
 ```
 npm install --save react-router
-npm install --save-dev redux-freeze
 ```
 
 ```js
 import createStore from 'modular-redux-thunk';
 import { routerReducer } from 'react-router-redux';
-import reduxFreeze from 'redux-freeze';
 
 const { store, pickActions, selectors } = createStore(myModularReduxDefinition, {
 	reducers: {
 		routing: routerReducer
 	},
-	enhancers: [reduxFreeze]
+	enhancers: []
 });
 ```
 

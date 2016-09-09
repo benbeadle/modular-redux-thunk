@@ -31,6 +31,11 @@
     "url": "https://github.com/benbeadle/modular-redux-thunk/issues"
   },
   "homepage": "https://github.com/benbeadle/modular-redux-thunk",
+  "dependencies": {
+    "redux-freeze": "^0.1.4",
+    "redux-thunk": "^2.1.0",
+    "redux": "^3.5.2"
+  },
   "devDependencies": {
     "babel-cli": "^6.11.4",
     "babel-core": "^6.11.4",
@@ -46,9 +51,6 @@
     "react-addons-test-utils": "^15.3.0",
     "react-dom": "^15.3.0",
     "react-redux": "^4.4.5",
-    "redux": "^3.5.2",
-    "redux-freeze": "^0.1.4",
-    "redux-thunk": "^2.1.0",
     "sinon": "^1.17.5",
     "warning": "^3.0.0"
   }

@@ -55,7 +55,12 @@ const getChips = () => ({
     }
   },
   actions: {
-    setFavoriteChips: (newFavorite) => ({ type: 'NEW_FAVORITE_CHIPS', newFavorite })
+    setFavoriteChips: (newFavorite) => ({ type: 'NEW_FAVORITE_CHIPS', newFavorite }),
+    setFavChipsAsync: (newFavorite) => {
+      return dispatch => {
+        dispatch({ type: 'NEW_FAVORITE_CHIPS', newFavorite })
+      };
+    }
   },
   selectors: {
     getFavoriteChips: chipState => chipState.favorite
@@ -80,6 +85,15 @@ describe('createStore', function() {
     expectObjKeysToDeepEqual(myActions, ['setFavoriteChips']);
 
     store.dispatch(myActions.setFavoriteChips('bbq'));
+    expect(store.getState()).to.deep.equal({chips:{favorite:'bbq'}});
+  });
+
+  it('should allow async actions', function() {
+    const chips = getChipsReducer();
+    const { store, selectors, actions, pickActions } = createStore(chips);
+
+    const myActions = pickActions('setFavChipsAsync');
+    store.dispatch(myActions.setFavChipsAsync('bbq'));
     expect(store.getState()).to.deep.equal({chips:{favorite:'bbq'}});
   });
 

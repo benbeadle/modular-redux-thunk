@@ -89,24 +89,29 @@ const createStore = (modularReduxDefinition, globalDefinitions=null, reduxConfig
   // Bind the actions object as the first argument so the picking can actually be done.
   const pickActions = pickActionsWrapper.bind(pickActionsWrapper, actions);
 
+  // Thunk allows us to use async actions
   middleware.push(thunk);
 
-  // Thunk allows us to create async actions.
-  if (process.env.NODE_ENV !== 'production') {
+  const isNotProd = process.env.NODE_ENV !== 'production';
+
+  // If we aren't in production, then add redux freeze to ensure the
+  // state is never directly manipulated.
+  if (isNotProd) {
     // Ensure the state is never modified directly using redux-freeze.
     // NOTE: This is NOT included in the production build.
     middleware.push(require('redux-freeze'));
-
-    // Allow use of the Redux DevTools Chrome extension.
-    // (https://github.com/zalmoxisus/redux-devtools-extension)
-    if('window' in global && window.devToolsExtension) {
-      enhancers.push(window.devToolsExtension());
-    }
   }
 
   // Apply all middlewares and add to the enhancers.
   if(middleware.length > 0) {
     enhancers.push(applyMiddleware(...middleware));
+  }
+
+  // Allow use of the Redux DevTools Chrome extension.
+  // (https://github.com/zalmoxisus/redux-devtools-extension)
+  // NOTE: This needs to be the last enhancer!
+  if (isNotProd && 'window' in global && window.devToolsExtension) {
+    enhancers.push(window.devToolsExtension());
   }
 
   // Compose all of the enhancers into one function.
