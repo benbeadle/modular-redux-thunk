@@ -91,7 +91,7 @@ export default { actions, reducers, selectors };
 
 `reducers/drinks.js`
 ```js
-import { combineModules } from 'modular-redux-thunk';
+import { combineModules, settableValue } from 'modular-redux-thunk';
 const actions = {};
 const reducers = {};
 const selectors = {};
@@ -117,24 +117,8 @@ const favorite = {
 	}
 }
 
-const SET_DRINKS_FOR_SALE = `${ACTION_PREPEND}/SET_DRINKS_FOR_SALE`;
-const drinksForSale = {
-	reducer: (state = [], action) => {
-	  switch(action.type) {
-	    case SET_DRINKS_FOR_SALE: return action.drinks;
-	    default: return state;
-	  };
-	},
-	actions: {
-		setDrinksForSale: (drinks) => ({
-			type: SET_DRINKS_FOR_SALE,
-	    drinks
-		})
-	},
-	selectors: {
-		getDrinksForSale: (drinksForSaleState) => drinksForSaleState
-	}
-}
+// Or even use a module creator function to automate this common pattern
+const drinksForSale = settableValue([], 'getDrinksForSale', 'setDrinksForSale');
 
 export default combineModules({
 	favorite,
@@ -231,7 +215,7 @@ A module object consists of:
 
 ## `createStore(modules, [globalDefinitions], [reduxConfig])`
 
-Create's a Redux store that combines your reducers into a single and complete state tree.
+Creates a Redux store that combines your reducers into a single and complete state tree.
 
 ### Arguments
 
@@ -246,9 +230,20 @@ Create's a Redux store that combines your reducers into a single and complete st
 	- `[middleware]` (*array*):  Any custom middleware to be added to the store. [redux-thunk](https://github.com/gaearon/redux-thunk) is automatically included as a middleware for your convenience.
 	- `[enhancers]` (*array*):  Any custom enhancers to be added to the store, such as [redux-freeze](https://github.com/buunguyen/redux-freeze). When not in production, [redux-devtools-extension](https://github.com/zalmoxisus/redux-devtools-extension) is automatically added for your convenience.
 
-## combineModules(modules)
+## `combineModules(modules)`
 
 Takes a map of Module objects and returns a single Module object.
+
+## `settableValue(initialValue, selectorName, actionName, [actionType])`
+
+Creates a module that controls a single value and responds to a single "set" action, as is quite common in Redux.
+
+### Arguments
+
+1. `initialValue` - The initial value of the module
+2. `selectorName` - The name of the module's single selector - usually something like `getMyValue`
+3. `actionName` - The name of the module's single action creator - usually something like `setMyValue`
+4. `actionType` - Optional. The action's type constant - usually something like `SET_MY_VALUE`. If not set, it will default to `actionName`.
 
 # TODO
 - Finish pending tests

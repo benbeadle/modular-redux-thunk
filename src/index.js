@@ -1,5 +1,6 @@
 import createStore from './store.js';
 import { combineModules } from './modules';
+import { settableValue } from './moduleCreators';
 
 // Instead of:
 //    "export default createStore"
@@ -9,3 +10,4 @@ import { combineModules } from './modules';
 //    require('modular-redux-thunk').default
 module.exports = createStore;
 module.exports.combineModules = combineModules;
+module.exports.settableValue = settableValue;
