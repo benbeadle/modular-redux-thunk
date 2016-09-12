@@ -103,7 +103,4 @@ describe('modules', function () {
     const combinedModule = combineModules({ testModule });
     expect(combinedModule.reducer(undefined, { type: '__INIT__' })).to.deep.equal({ testModule: 'hello' });
   });
-
-  // it('should have a settableValueModule helper')
-  // it('should support array modules of some sort')
 });
