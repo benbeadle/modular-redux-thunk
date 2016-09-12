@@ -5,41 +5,41 @@ describe('deeply nested modules', function () {
   const SET_FAVORITE_CHIPS = 'chips/SET_FAVORITE_CHIPS';
   const SET_CHIPS_FOR_SALE = 'chips/SET_CHIPS_FOR_SALE';
 
-  const favoriteChips = {
-    reducer: (state = 'unknown', action) => {
-      switch (action.type) {
-        case SET_FAVORITE_CHIPS:
-          return action.newFav;
-        default:
-          return state;
-      }
-    },
-    actions: {
-      setFavoriteChips: (newFav) => ({ type: SET_FAVORITE_CHIPS, newFav })
-    },
-    selectors: {
-      getFavoriteChips: (state) => state
-    }
-  }
-
-  const chipsForSale = {
-    reducer: (state = [], action) => {
-      switch (action.type) {
-        case SET_CHIPS_FOR_SALE:
-          return action.chips
-        default:
-          return state;
-      }
-    },
-    actions: {
-      setChipsForSale: (chips) => ({ type: SET_CHIPS_FOR_SALE, chips })
-    },
-    selectors: {
-      getChipsForSale: (state) => state
-    }
-  };
-
   it('should combine modules', function () {
+    const favoriteChips = {
+      reducer: (state = 'unknown', action) => {
+        switch (action.type) {
+          case SET_FAVORITE_CHIPS:
+            return action.newFav;
+          default:
+            return state;
+        }
+      },
+      actions: {
+        setFavoriteChips: (newFav) => ({ type: SET_FAVORITE_CHIPS, newFav })
+      },
+      selectors: {
+        getFavoriteChips: (state) => state
+      }
+    }
+
+    const chipsForSale = {
+      reducer: (state = [], action) => {
+        switch (action.type) {
+          case SET_CHIPS_FOR_SALE:
+            return action.chips
+          default:
+            return state;
+        }
+      },
+      actions: {
+        setChipsForSale: (chips) => ({ type: SET_CHIPS_FOR_SALE, chips })
+      },
+      selectors: {
+        getChipsForSale: (state) => state
+      }
+    };
+
     const singleModule = combineModules({
       favoriteChips,
       chipsForSale
@@ -68,7 +68,33 @@ describe('deeply nested modules', function () {
     expect(singleModule.selectors.getChipsForSale(mockState)).to.deep.equal(['salt & vinegar'], 'should combine selectors');
   });
 
+  it('should support reducers property for compatability with classic module pattern', function () {
+    const chips = {
+      reducers: {
+        favorite: (state = 'bbq', action) => state,
+        forSale: (state = ['salt & vinegar'], action) => state,
+      },
+      actions: {},
+      selectors: {
+        getFavoriteChips: (state) => state.favorite,
+        getChipsForSale: (state) => state.forSale
+      },
+    };
+    const favoriteDrink = {
+      reducer: (state = 'coffee', action) => state,
+      actions: {},
+      selectors: {
+        getFavoriteDrink: (state) => state,
+      },
+    }
+
+    const singleModule = combineModules({ chips, favoriteDrink });
+    const state = singleModule.reducer(undefined, { type: '__INIT__' });
+    expect(singleModule.selectors.getFavoriteChips(state)).to.equal('bbq');
+    expect(singleModule.selectors.getChipsForSale(state)).to.deep.equal(['salt & vinegar']);
+    expect(singleModule.selectors.getFavoriteDrink(state)).to.equal('coffee');
+  });
+
   // it('should have a settableValueModule helper')
   // it('should support array modules of some sort')
-  // it('should support reducers property for compatability with classic module pattern')
 });

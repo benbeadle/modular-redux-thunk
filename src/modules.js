@@ -7,9 +7,14 @@ const mapModules = (modules, fn) =>
     Object.assign(obj, {[k]: fn(modules[k])})
   , {});
 
+const getReducerFromModule = (module) =>
+  module.reducers
+    ? combineReducers(module.reducers)
+    : module.reducer;
+
 export function combineModules(modules) {
   const reducer = combineReducers(
-    mapModules(modules, m => m.reducer)
+    mapModules(modules, getReducerFromModule)
   );
   const actions = combineActions(
     mapModules(modules, m => m.actions)
