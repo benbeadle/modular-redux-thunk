@@ -9,7 +9,7 @@ import thunk from 'redux-thunk';
 import combineSelectors, { addGlobalSelectors } from './selectors.js';
 import combineActions, { pickActions as pickActionsWrapper, addGlobalActions } from './actions.js';
 
-import { combineModules } from './modules';
+import { combineModules, reducerToModule } from './modules';
 
 import consoleErrors from './consoleErrors.js';
 
@@ -62,7 +62,14 @@ const createStore = (modularReduxDefinition, globalDefinitions=null, reduxConfig
   const { globalSelectors = {}, globalActions = {} } = (globalDefinitions || {});
   const { reducers = {}, middleware = [], enhancers = [] } = (reduxConfig || {});
 
-  const rootModule = combineModules(modularReduxDefinition);
+  const reducerModules = Object.keys(reducers).reduce((obj, k) =>
+    Object.assign(obj, { [k]: reducerToModule(reducers[k]) })
+  , {});
+
+  const rootModule = combineModules(Object.assign({},
+    modularReduxDefinition,
+    reducerModules
+  ));
 
   // Combine all reducer's selectors and any global selectors into one.
   const selectors = addGlobalSelectors(rootModule.selectors, globalSelectors);

@@ -35,3 +35,11 @@ export function combineModules(modules) {
     selectors,
   };
 }
+
+export function reducerToModule(reducer) {
+  return {
+    reducer,
+    actions: {},
+    selectors: {}
+  };
+}
