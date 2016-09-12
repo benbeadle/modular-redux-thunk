@@ -255,7 +255,7 @@ Creates a module that controls a single value and responds to a single "set" act
 #### Releasing
 ```
 Commit all changes
-npm run build -> test && clean:build && build && test:build
+npm run build # runs "npm test && npm run clean:build && npm run build && npm run test:build"
 npm version "v1.0.0-beta1" -m "Message"
 npm publish
 git push origin HEAD:master --tags
