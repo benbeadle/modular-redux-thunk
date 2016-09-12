@@ -1,11 +1,7 @@
 import { combineReducers } from 'redux';
 import combineActions from './actions';
 import combineSelectors from './selectors';
-
-const mapModules = (modules, fn) =>
-  Object.keys(modules).reduce((obj, k) =>
-    Object.assign(obj, {[k]: fn(modules[k])})
-  , {});
+import consoleErrors from './consoleErrors';
 
 const getReducerFromModule = (module) =>
   module.reducers
@@ -13,20 +9,29 @@ const getReducerFromModule = (module) =>
     : module.reducer;
 
 export function combineModules(modules) {
-  const reducer = combineReducers(
-    mapModules(modules, getReducerFromModule)
-  );
-  const actions = combineActions(
-    mapModules(modules, m => m.actions)
-  );
-  const selectors = combineSelectors(
-    mapModules(modules, m => m.selectors)
-  );
+  // Break down modules into objects for the reducer,
+  // selectors, and actions of each reducer defined.
+  const reducers = {};
+  const moduleSelectors = {};
+  const moduleActions = {};
+  Object.keys(modules).forEach(name => {
+    const module = modules[name];
+    // We only add the config if it's a valid defined module.
+    if(!consoleErrors.invalidReducerConfig(name, module)) {
+      // Since the reducers is an object of reducers, combine them into one module.
+      reducers[name] = getReducerFromModule(module);
+      moduleSelectors[name] = module.selectors;
+      moduleActions[name] = module.actions;
+    }
+  });
+
+  const reducer = combineReducers(reducers);
+  const selectors = combineSelectors(moduleSelectors);
+  const actions = combineActions(moduleActions);
 
   return {
     reducer,
     actions,
     selectors,
-    _modulesCombined: true
   };
 }

@@ -14,7 +14,7 @@ import consoleErrors from './consoleErrors.js';
  *                                     global actions to trigger reducer actions.
  * @return {Object}                    All actions combined into one object.
  */
-const combineActions = (reducers, globalActions = {}) => {
+const combineActions = (reducers) => {
   let combinedActions = {};
 
   // Combine all reducers' actions into one object.
@@ -36,6 +36,10 @@ const combineActions = (reducers, globalActions = {}) => {
     });
   });
 
+  return combinedActions
+};
+
+const addGlobalActions = (combinedActions, globalActions) => {
   // If there's any global actions, then do the same thing as above.
   Object.keys(globalActions).forEach(actionName => {
     const globalAction = globalActions[actionName];
@@ -58,7 +62,7 @@ const combineActions = (reducers, globalActions = {}) => {
   });
 
   return combinedActions;
-};
+}
 
 /**
  * A function useful to components so they can pick what actions they use so
@@ -85,4 +89,4 @@ const pickActions = (actions, ...actionNames) => {
 };
 
 export default combineActions;
-export { pickActions };
+export { pickActions, addGlobalActions };

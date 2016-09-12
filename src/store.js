@@ -6,8 +6,10 @@
 import { combineReducers, createStore as reduxCreateStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
 
-import combineSelectors from './selectors.js';
-import combineActions, { pickActions as pickActionsWrapper } from './actions.js';
+import combineSelectors, { addGlobalSelectors } from './selectors.js';
+import combineActions, { pickActions as pickActionsWrapper, addGlobalActions } from './actions.js';
+
+import { combineModules } from './modules';
 
 import consoleErrors from './consoleErrors.js';
 
@@ -56,36 +58,18 @@ const createStore = (modularReduxDefinition, globalDefinitions=null, reduxConfig
   // NOTE: This was moved to another function for easy testing.
   ({ globalDefinitions, reduxConfig } = switchGlobalDefinitionsAndReduxConfig(globalDefinitions,reduxConfig));
 
-
-
   // Extract all the variables from the optional params.
   const { globalSelectors = {}, globalActions = {} } = (globalDefinitions || {});
   const { reducers = {}, middleware = [], enhancers = [] } = (reduxConfig || {});
 
-  // Break down modularReduxDefinition into objects for the reducer,
-  // selectors, and actions of each reducer defined.
-  const reducerSelectors = {};
-  const reducerActions = {};
-  Object.keys(modularReduxDefinition).forEach(name => {
-    const reducer = modularReduxDefinition[name];
-    // We only add the config if it's a valid defined reducer.
-    if(!consoleErrors.invalidReducerConfig(name, reducer)) {
-      // Since the reducers is an object of reducers, combine them into one reducer.
-      reducers[name] = combineReducers(reducer['reducers']);
-      reducerSelectors[name] = reducer['selectors'];
-      reducerActions[name] = reducer['actions'];
-    }
-  });
-
-  // Create the root reducer which combines all other reducers.
-  // This will also include any custom reducers passed into reduxConfig.
-  const rootReducer = combineReducers(reducers);
+  const rootModule = combineModules(modularReduxDefinition);
 
   // Combine all reducer's selectors and any global selectors into one.
-  const selectors = combineSelectors(reducerSelectors, globalSelectors);
+  const selectors = addGlobalSelectors(rootModule.selectors, globalSelectors);
 
   // Combine all actions and return the action props creator function
-  const actions = combineActions(reducerActions, globalActions);
+  const actions = addGlobalActions(rootModule.actions, globalActions);
+
   // Bind the actions object as the first argument so the picking can actually be done.
   const pickActions = pickActionsWrapper.bind(pickActionsWrapper, actions);
 
@@ -126,7 +110,7 @@ const createStore = (modularReduxDefinition, globalDefinitions=null, reduxConfig
   }
 
   // Now create the store from the reducer,
-  const store = reduxCreateStore(rootReducer, undefined, composedEnhancers);
+  const store = reduxCreateStore(rootModule.reducer, undefined, composedEnhancers);
 
   return { store, selectors, actions, pickActions };
 };
