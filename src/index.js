@@ -1,5 +1,5 @@
 import createStore from './store.js';
-import { combineModules, reducerToModule } from './modules';
+import { combineModules } from './modules';
 
 // Instead of:
 //    "export default createStore"
@@ -9,4 +9,3 @@ import { combineModules, reducerToModule } from './modules';
 //    require('modular-redux-thunk').default
 module.exports = createStore;
 module.exports.combineModules = combineModules;
-module.exports.reducerToModule = reducerToModule;
