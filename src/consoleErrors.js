@@ -80,12 +80,6 @@ consoleErrors.invalidReducerConfig = (reducerName, reducerConfig) => {
   }
 
   let hasReducer = false;
-  // if (reducerConfig.reducer) {
-    // if (typeof reducerConfig.reducer === 'function') {
-    //   warning(false, `The "reducer" value of the ${reducerName} config should be a function, not ${typeof reducerConfig.reducer}.`);
-    //   return true;
-    // }
-  // }
 
   if (reducerConfig.reducers) {
     if (typeof reducerConfig.reducers !== 'object') {
