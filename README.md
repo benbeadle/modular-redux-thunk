@@ -7,11 +7,11 @@ A [ducks](https://github.com/erikras/ducks-modular-redux)-inspired package to he
 
 
 ### Rules
-- **Each reducer is only aware of it's own state.** Reducer's don't care or know about each other's state.
-- **Only a reducer should be aware of how its state is structured.** You define all actions, reducers, and selectors in each reducer that manipulate and retrieve data from that reducer.
+- **Each module is only aware of it's own state.** Reducer's don't care or know about each other's state.
+- **Only a module should be aware of how its state is structured.** You define all actions, reducers, and selectors in each module that manipulate and retrieve data from that reducer.
 - **You can define global actions and global selectors.** Occasionally, you'll need to dispatch actions or define selectors that use multiple reducers. Global actions have access to all defined actions, and global reducers have access to all defined selectors.
-- **Connected components should not assume to know how the store is structured.** When creating connected components, you should never reference the state directly. Instead, use the selectors you've defined in each reducer, and any global reducers, to return that data.
-- **You should not have to update your connected components when changing your store's structure.** This is a huge bonus. Since all components use *pickActions* and *selectors* (more about that below), you can change your store's structure as much as you'd like. For example, you can move a data node from one reducer to another without affecting your components - as along as you maintain your actions and update your selectors to reflect the latest structure.
+- **Connected components should not assume to know how the store is structured.** When creating connected components, you should never reference the state directly. Instead, use the selectors you've defined in each module, and any global reducers, to return that data.
+- **You should not have to update your connected components when changing your store's structure.** This is a huge bonus. Since all components use *pickActions* and *selectors* (more about that below), you can change your store's structure as much as you'd like. For example, you can move a data node from one module to another without affecting your components - as along as you maintain your actions and update your selectors to reflect the latest structure.
 
 # Installation
 
@@ -20,7 +20,7 @@ A [ducks](https://github.com/erikras/ducks-modular-redux)-inspired package to he
 ```js
 import createStore from 'modular-redux-thunk';
 
-const { store, pickActions, selectors } = createStore(myModularReduxDefinition);
+const { store, pickActions, selectors } = createStore(myModules);
 ```
 
 You can also include custom reducers, middleware, or enhancers. For example, if you install react-router and redux-freeze:
@@ -33,7 +33,7 @@ npm install --save react-router
 import createStore from 'modular-redux-thunk';
 import { routerReducer } from 'react-router-redux';
 
-const { store, pickActions, selectors } = createStore(myModularReduxDefinition, {
+const { store, pickActions, selectors } = createStore(myModules, {
 	reducers: {
 		routing: routerReducer
 	},
@@ -44,9 +44,9 @@ const { store, pickActions, selectors } = createStore(myModularReduxDefinition, 
 # Example
 
 Let's say your app will be storing the following information in the state:
-* A list of chips you sale
+* A list of chips you sell
 * The logged-in-user's favorite chips
-* A list of drinks you sale
+* A list of drinks you sell
 * The logged-in-user's favorite drink
 
 `reducers/chips.js`
@@ -91,42 +91,39 @@ export default { actions, reducers, selectors };
 
 `reducers/drinks.js`
 ```js
+import { combineModules, settableValue } from 'modular-redux-thunk';
 const actions = {};
 const reducers = {};
 const selectors = {};
 const ACTION_PREPEND = 'my-react-app/drinks';
 
+// You can also define individual modules and combine them
 const SET_FAVORITE_DRINK = `${ACTION_PREPEND}/SET_FAVORITE_DRINK`;
-reducers.favorite = (state = 'unknown', action) => {
-  switch(action.type) {
-    case SET_FAVORITE_DRINK: return action.newFav;
-    default: return state;
-  };
-};
-actions.setFavoriteDrink = (newFav) => {
-  return {
-    type: SET_FAVORITE_DRINK,
-    newFav
-  };
-};
-selectors.getFavoriteDrink = (drinkState) => drinkState.favorite;
+const favorite = {
+	reducer: (state = 'unknown', action) => {
+	  switch(action.type) {
+	    case SET_FAVORITE_DRINK: return action.newFav;
+	    default: return state;
+	  };
+	},
+	actions: {
+		setFavoriteDrink: (newFav) => ({
+	    type: SET_FAVORITE_DRINK,
+	    newFav
+	  })
+	},
+	selectors: {
+		getFavoriteDrink: (favoriteDrinkState) => favoriteDrinkState;
+	}
+}
 
-const SET_DRINKS_FOR_SALE = `${ACTION_PREPEND}/SET_DRINKS_FOR_SALE`;
-reducers.drinksForSale = (state = [], action) => {
-  switch(action.type) {
-    case SET_DRINKS_FOR_SALE: return action.drinks;
-    default: return state;
-  };
-};
-actions.setDrinksForSale = (drinks) => {
-  return {
-    type: SET_DRINKS_FOR_SALE,
-    drinks
-  };
-};
-selectors.getDrinksForSale = (drinksState) => drinksState.drinks;
+// Or even use a module creator function to automate this common pattern
+const drinksForSale = settableValue([], 'getDrinksForSale', 'setDrinksForSale');
 
-export default { actions, reducers, selectors };
+export default combineModules({
+	favorite,
+	drinksForSale
+});
 ```
 
 `reducers/selectors.js`
@@ -158,14 +155,14 @@ import drinks from './drinks.js';
 import * as globalActions from './actions.js';
 import * as globalSelectors from './selectors.js';
 
-const reducers = {chips, drinks};
+const modules = {chips, drinks};
 
 const globals = {
   globalActions: globalActions,
   globalSelectors: globalSelectors
 };
 
-const { store, selectors, pickActions } = createStore(reducers, globals);
+const { store, selectors, pickActions } = createStore(modules, globals);
 export { store, selectors, pickActions };
 ```
 
@@ -206,17 +203,23 @@ ReactDOM.render(
 
 # API Reference
 
-`createStore(modularReduxDefinition, [globalDefinitions], [reduxConfig])`
+## Module
 
-Create's a Redux store that combines your reducers into a single and complete state tree.
+A module object consists of:
+
+- One of the following:
+	- `reducer` - A standard Redux reducer function. Each reducer should be defined in it's simplest form. For example, define reducers that are strings, booleans, numbers, or arrays.
+	- `reducers` - An object of Redux reducer functions. If you choose this option, its value will be run through `Redux.combineReducers`.
+- `actions` (*object*): A map of action creator functions. Each action should return an object with, at the very least, a `type` property.
+- `selectors` (*object*): Selector functions that connected components call to get parts of the state. A selector's first and only argument is the module's current state.
+
+## `createStore(modules, [globalDefinitions], [reduxConfig])`
+
+Creates a Redux store that combines your reducers into a single and complete state tree.
 
 ### Arguments
 
-1. `modularReduxDefinition` (*object*): Defines the global structure of the store. Each key represents the reducer's location in the store, and the value is the reducer object itself. Each reducer object should have three keys:
-	- `reducers` (*object*): Data nodes that respond to actions. Each data node should be defined in it's simplest form. For example, define reducers that are strings, booleans, numbers, or arrays.
-	- `actions` (*object*): Actions that can be performed on the reducers. Actions are how your connected components manipulate the store.
-	- `selectors` (*object*): Selectors that connected components call to get parts of the reducer. Selectors first argument will always be:
-		- `reducerState` (*object*):  The state of the reducer, which is used to return parts of the state.
+1. `modules` (*object*): Defines the global structure of the store. Each key represents the modules's location in the store, and the value is the module object itself. Module objects are described above.
 2. `[globalDefinitions]` (*object*):  Pass in any global actions or selectors. Globals are given access to all reducers. You can pass in the following keys:
 	- `[globalActions]` (*object*):  Actions that can themselves perform actions from any reducer. Global actions differ from reducer actions in that the first argument will always be:
 		- `combinedActions` (*object*):  All combined actions from reducers. This allows you to reference reducer-defined actions.
@@ -227,6 +230,20 @@ Create's a Redux store that combines your reducers into a single and complete st
 	- `[middleware]` (*array*):  Any custom middleware to be added to the store. [redux-thunk](https://github.com/gaearon/redux-thunk) is automatically included as a middleware for your convenience.
 	- `[enhancers]` (*array*):  Any custom enhancers to be added to the store, such as [redux-freeze](https://github.com/buunguyen/redux-freeze). When not in production, [redux-devtools-extension](https://github.com/zalmoxisus/redux-devtools-extension) is automatically added for your convenience.
 
+## `combineModules(modules)`
+
+Takes a map of Module objects and returns a single Module object.
+
+## `settableValue(initialValue, selectorName, actionName, [actionType])`
+
+Creates a module that controls a single value and responds to a single "set" action, as is quite common in Redux.
+
+### Arguments
+
+1. `initialValue` - The initial value of the module
+2. `selectorName` - The name of the module's single selector - usually something like `getMyValue`
+3. `actionName` - The name of the module's single action creator - usually something like `setMyValue`
+4. `actionType` - Optional. The action's type constant - usually something like `SET_MY_VALUE`. If not set, it will default to `actionName`.
 
 # TODO
 - Finish pending tests
@@ -238,7 +255,7 @@ Create's a Redux store that combines your reducers into a single and complete st
 #### Releasing
 ```
 Commit all changes
-npm run build -> test && clean:build && build && test:build
+npm run build # runs "npm test && npm run clean:build && npm run build && npm run test:build"
 npm version "v1.0.0-beta1" -m "Message"
 npm publish
 git push origin HEAD:master --tags

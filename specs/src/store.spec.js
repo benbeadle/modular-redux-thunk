@@ -4,7 +4,7 @@ import sinon from 'sinon';
 // Import the default function and then import the rest seperately.
 // If you do import { } from '...', then they can't be stubbed.
 import createStore, { switchGlobalDefinitionsAndReduxConfig } from './../../src/store.js';
-
+import { combineModules } from '../../src/modules';
 import consoleErrors from './../../src/consoleErrors.js';
 
 const itWithConsoleErrorsSpy = function(should, fn) {
@@ -325,6 +325,33 @@ describe('createStore', function() {
 
     const { store } = createStore({chips, drinks});
     expect(store.getState()).to.deep.equal({chips:{}});
+  });
+
+  it('should support combined modules', function () {
+    const favoriteChip = {
+      reducer: (state = 'bbq', action) => state,
+      actions: {
+        clearFavoriteChip: () => ({type:'CLEAR_FAVORITE_CHIP'})
+      },
+      selectors: {}
+    };
+    const favoriteDrink = {
+      reducer: (state = 'mountain dew', action) => state,
+      actions: {
+        clearFavoriteDrink: () => ({type:'CLEAR_FAVORITE_DRINK'})
+      },
+      selectors: {}
+    };
+
+    const { store } = createStore({
+      refreshments: combineModules({ favoriteChip, favoriteDrink })
+    });
+    expect(store.getState()).to.deep.equal({
+      refreshments: {
+        favoriteChip: 'bbq',
+        favoriteDrink: 'mountain dew',
+      }
+    });
   });
 
   it('should include redux-freeze when not in production');

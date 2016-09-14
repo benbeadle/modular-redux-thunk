@@ -229,5 +229,26 @@ describe('consoleErrors', function() {
         expect(invalidReducerConfig).to.equal(true);
       });
     });
+
+    itWithConsoleErrorStub('should allow either reducers or reducer', function () {
+      const testConfig = validConfigCopy();
+      delete testConfig.reducers;
+      testConfig.reducer = (state, action) => 'hello';
+
+      const result = consoleErrors.invalidReducerConfig('reDUCerNAMe', testConfig);
+      expect(result).to.equal(false);
+      expectCallCount().to.equal(0);
+    });
+
+    itWithConsoleErrorStub('should fail if reducer is not a function', function () {
+      const testConfig = validConfigCopy();
+      delete testConfig.reducers;
+      testConfig.reducer = 'nope';
+
+      const result = consoleErrors.invalidReducerConfig('reDUCerNAMe', testConfig);
+      expectCallCount().to.equal(1);
+      expect(result).to.equal(true);
+      expectArg().to.contain('reDUCerNAMe').and.contain('reducer').and.contain('function').and.contain('not string');
+    });
   });
 });

@@ -65,7 +65,7 @@ consoleErrors.noArgsDefined = (name, funcName, func, argDesc) => {
  * @return {bool}                 True if it's missing a key or the key value is invalid, else false.
  */
 consoleErrors.invalidReducerConfig = (reducerName, reducerConfig) => {
-  const requiredKeys = ['reducers', 'actions', 'selectors'];
+  const requiredKeys = ['actions', 'selectors'];
   for(let i = 0; i < requiredKeys.length; i++) {
     const key = requiredKeys[i];
 
@@ -77,6 +77,27 @@ consoleErrors.invalidReducerConfig = (reducerName, reducerConfig) => {
       warning(false, `The "${key}" value of the ${reducerName} config should be an object, not ${typeof reducerConfig[key]}.`);
       return true;
     }
+  }
+
+  let hasReducer = false;
+
+  if (reducerConfig.reducers) {
+    if (typeof reducerConfig.reducers !== 'object') {
+      warning(false, `The "reducers" value of the ${reducerName} config should be an object, not ${typeof reducerConfig.reducers}.`);
+      return true;
+    }
+    hasReducer = true;
+  } else if (reducerConfig.reducer) {
+    if (typeof reducerConfig.reducer !== 'function') {
+      warning(false, `The "reducer" value of the ${reducerName} config should be a function, not ${typeof reducerConfig.reducer}.`);
+      return true;
+    }
+    hasReducer = true;
+  }
+
+  if (!hasReducer) {
+    warning(false, `The ${reducerName} config should have either a "reducer" or "reducers" property defined.`);
+    return true;
   }
 
   return false;

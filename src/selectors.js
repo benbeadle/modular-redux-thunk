@@ -54,6 +54,10 @@ const combineSelectors = (reducers, globalSelectors = {}) => {
     });
   });
 
+  return combinedSelectors;
+};
+
+export const addGlobalSelectors = (combinedSelectors, globalSelectors) => {
   // If there's any global selectors, then do the same thing as above.
   Object.keys(globalSelectors).map(selectorName => {
     const selector = globalSelectors[selectorName];
