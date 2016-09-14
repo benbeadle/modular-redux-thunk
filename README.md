@@ -230,6 +230,16 @@ Creates a Redux store that combines your reducers into a single and complete sta
 	- `[middleware]` (*array*):  Any custom middleware to be added to the store. [redux-thunk](https://github.com/gaearon/redux-thunk) is automatically included as a middleware for your convenience.
 	- `[enhancers]` (*array*):  Any custom enhancers to be added to the store, such as [redux-freeze](https://github.com/buunguyen/redux-freeze). When not in production, [redux-devtools-extension](https://github.com/zalmoxisus/redux-devtools-extension) is automatically added for your convenience.
 
+### Returns
+
+Returns an object with the following properties:
+
+1. `store` (*Store*): A Redux store that lets you read the state, dispatch actions
+ * and subscribe to changes.
+2. `pickActions` (*function*): A function that returns an object of desired actions out of all available actions. Use this instead of passing the `actions` object to your connected components.
+3. `selectors` (*object*): All combined selectors for use when connecting your components.
+4. `actions` (*object*): All available actions. You can cherry-pick actions here as opposed to using `pickActions`.
+
 ## `combineModules(modules)`
 
 Takes a map of Module objects and returns a single Module object.
