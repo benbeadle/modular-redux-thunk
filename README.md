@@ -1,7 +1,7 @@
 Modular Redux Thunk
 =============
 
-[![Dependency Status](https://gemnasium.com/badges/github.com/benbeadle/modular-redux-thunk.svg)](https://gemnasium.com/github.com/benbeadle/modular-redux-thunk) [![npm version](https://img.shields.io/npm/v/modular-redux-thunk.svg?style=flat-square)](https://www.npmjs.com/package/modular-redux-thunk)
+[![Dependency Status](https://gemnasium.com/badges/github.com/benbeadle/modular-redux-thunk.svg)](https://gemnasium.com/github.com/benbeadle/modular-redux-thunk) [![npm version](https://img.shields.io/npm/v/modular-redux-thunk.svg?style=flat-square)](https://www.npmjs.com/package/modular-redux-thunk) [![Build Status](https://travis-ci.org/benbeadle/modular-redux-thunk.svg?branch=master)](https://travis-ci.org/benbeadle/modular-redux-thunk)
 
 A [ducks](https://github.com/erikras/ducks-modular-redux)-inspired package to help organize actions, reducers, and selectors together - with built-in [redux-thunk](https://github.com/gaearon/redux-thunk) support for async actions.
 
@@ -257,7 +257,6 @@ Creates a module that controls a single value and responds to a single "set" act
 
 # TODO
 - Finish pending tests
-- Travis CI (and status)
 - Coveralls.io / Fix Istanbul (and status)
 - Minify build
 
