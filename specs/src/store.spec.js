@@ -1,9 +1,10 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
+import omit from 'lodash/omit';
 
 // Import the default function and then import the rest seperately.
 // If you do import { } from '...', then they can't be stubbed.
-import createStore, { switchGlobalDefinitionsAndReduxConfig } from './../../src/store.js';
+import createStore, { createStoreArgsToNamedArgs } from './../../src/store.js';
 import { combineModules } from '../../src/modules';
 import consoleErrors from './../../src/consoleErrors.js';
 
@@ -72,6 +73,48 @@ const getChipsReducer = () => ({
 
 describe('createStore', function() {
 
+  describe('createStoreArgsToNamedArgs', function() {
+    const argVariations = [];
+    const newVariation = (args, {preloadedState=undefined, globalDefinitions=null, reduxConfig=null}={}) => {
+      argVariations.push({args, preloadedState, globalDefinitions, reduxConfig});
+    };
+
+    // The three possible args. The last two have an allowed key for that arg type.
+    const preloadedState = {preloaded:'state'};
+    const globalDefinitions = {'globalSelectors': 'globalSelectors'};
+    const reduxConfig = {'reducers': 'reducers'};
+
+    // 0
+    newVariation([]);
+    // 1
+    newVariation([preloadedState], {preloadedState});
+    newVariation([globalDefinitions], {globalDefinitions});
+    newVariation([reduxConfig], {reduxConfig});
+    // 2
+    newVariation([preloadedState, globalDefinitions], {preloadedState, globalDefinitions});
+    newVariation([preloadedState, reduxConfig], {preloadedState, reduxConfig});
+    newVariation([globalDefinitions, reduxConfig], {globalDefinitions, reduxConfig});
+    //  These are passed in incorrect order.
+    newVariation([globalDefinitions, preloadedState], {globalDefinitions});
+    newVariation([reduxConfig, preloadedState], {reduxConfig});
+    newVariation([reduxConfig, globalDefinitions], {reduxConfig});
+    // 3
+    newVariation([preloadedState, globalDefinitions, reduxConfig], {preloadedState, globalDefinitions, reduxConfig});
+    //  These are passed in incorrect order.
+    newVariation([preloadedState, reduxConfig, globalDefinitions], {preloadedState,reduxConfig});
+    newVariation([globalDefinitions, preloadedState, reduxConfig], {globalDefinitions});
+    newVariation([reduxConfig, preloadedState, globalDefinitions], {reduxConfig});
+    newVariation([globalDefinitions, reduxConfig, preloadedState], {globalDefinitions, reduxConfig});
+    newVariation([reduxConfig, globalDefinitions, preloadedState], {reduxConfig});
+
+    argVariations.forEach((variation, index) => {
+      it(`test # ${index} with ${variation.args.length} args`, function() {
+        const result = createStoreArgsToNamedArgs(variation.args);
+        expect(result).to.deep.equal(omit(variation, 'args'));
+      });
+    });
+  });
+
   it('should return an object which has the store, selectors, actions, and pickActions', function () {
     const chips = getChipsReducer();
     const { store, selectors, actions, pickActions } = createStore(chips);
@@ -97,70 +140,7 @@ describe('createStore', function() {
     expect(store.getState()).to.deep.equal({chips:{favorite:'bbq'}});
   });
 
-  it('should know when the second and/or third arg is reduxConfig instead of globalDefinitions', function() {
-
-    // We have different combinations of argument values to test to make sure
-    // all return the correct values.
-    const configs = [];
-
-    // If both args are null, then both should return as null.
-    configs.push({first:null, second:null, result:
-      {globalDefinitions:null, reduxConfig:null}});
-
-    // If both are defined, then they should return the same objects.
-    configs.push({first:{first:true}, second:{globalSecond:true}, result:
-      {globalDefinitions:{first:true}, reduxConfig:{globalSecond:true}}});
-
-    // We still test the use case where the user directly passes in null
-    // as globalDefinitions. Not that they would do this, but just in case.
-    configs.push({allowNull:true, first:null, second:{globalSecond:true}, result:
-      {globalDefinitions:null, reduxConfig:{globalSecond:true}}});
-
-    // If globalDefinitions is defined and not reduxConfig, then switch accordingly.
-    // The algorithm will switch if NO keys in globalDefinitions start with "global".
-    //
-    // NO - This test should not switch since all keys start with global
-    configs.push({first:{globalFirst:true}, second:null, result:
-      {globalDefinitions:{globalFirst:true}, reduxConfig:null}});
-    // YES - This test should switch since not all keys start with global
-    configs.push({first:{first:true,second:true}, second:null, result:
-      {globalDefinitions:null, reduxConfig:{first:true,second:true}}});
-    // NO - This test should not switch since some keys start with global
-    configs.push({first:{globalFirst:true,second:true}, second:null, result:
-      {globalDefinitions:{globalFirst:true,second:true}, reduxConfig:null}});
-
-    // If globalDefinitions is null and reduxConfig isn't, then it shouldn't do anything
-    configs.push({first:null, second:{second:true}, result:
-      {globalDefinitions:null, reduxConfig:{second:true}}});
-
-    for(const configIndex in configs) {
-      const config = configs[configIndex];
-
-      // We don't pass in null directly, as use-cases wouldn't normally either,
-      // unless the config specifically tells us to.
-      const args = [];
-      if(config.first !== null || config.allowNull) {
-        args.push(config.first);
-      }
-      if(config.second !== null || config.allowNull) {
-        args.push(config.second);
-      }
-      const { globalDefinitions, reduxConfig } = switchGlobalDefinitionsAndReduxConfig.apply(switchGlobalDefinitionsAndReduxConfig, args);
-
-      if(config.result.globalDefinitions === null) {
-        expect(globalDefinitions).to.equal(null, `(globalDefinitions - config index ${configIndex})`);
-      } else {
-        expect(globalDefinitions).to.deep.equal(config.result.globalDefinitions, `(globalDefinitions - config index ${configIndex})`);
-      }
-      if(config.result.reduxConfig === null) {
-        expect(reduxConfig).to.equal(null, `(reduxConfig - config index ${configIndex})`);
-      } else {
-        expect(reduxConfig).to.deep.equal(config.result.reduxConfig, `(reduxConfig - config index ${configIndex})`);
-      }
-    }
-  });
-
-  it('should call switchGlobalDefinitionsAndReduxConfig. Tested by passing reduxConfig as second arg', function() {
+  it('should call createStoreArgsToNamedArgs. Tested by passing reduxConfig as second arg', function() {
     const chips = getChipsReducer();
     const configEnhancer = sinon.spy(() => next => {
       return (reducer_, initialState_, enhancer_) => {

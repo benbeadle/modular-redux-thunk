@@ -41,22 +41,72 @@ export const switchGlobalDefinitionsAndReduxConfig = (globalDefinitions=null, re
 };
 
 /**
+ * Parses the args passed to createStore and returns an object with the
+ * 3 possible args and their values.
+ * NOTE: The args must be in the order denoted in createStore. For example,
+ * this function won't allow you to pass in reduxConfig before globalDefinitions.
+ * @param  {[type]} args The array of args passed to createStore (minus modularReduxDefinition)
+ * @return {[type]}      [description]
+ */
+export const createStoreArgsToNamedArgs = args => {
+  const namedArgs = {
+    // Redux expects preloadedState to be undefined, NOT null.
+    preloadedState: undefined,
+    globalDefinitions: null,
+    reduxConfig: null
+  };
+
+  // Don't do anything if there's no args.
+  if(args.length === 0) { return namedArgs; }
+
+  // Helper functions to test if objects are either a globalDefinition
+  // or reduxConfig by checking if their keys contain allowed keys.
+  const allowedGlobalDefKeys = ['globalSelectors', 'globalActions'];
+  const allowedReduxConfigKeys = ['reducers', 'middleware', 'enhancers'];
+  const isPreloadedState = obj => !isGlobalDef(obj) && !isReduxConfig(obj);
+  const isGlobalDef = obj => Object.keys(obj).some(k => allowedGlobalDefKeys.includes(k));
+  const isReduxConfig = obj => Object.keys(obj).some(k => allowedReduxConfigKeys.includes(k));
+
+  // Check the first arg if it's preloadedState
+  if(isPreloadedState(args[0])) {
+    namedArgs.preloadedState = args[0];
+    args.shift();
+  }
+
+  if(args.length === 0) { return namedArgs; }
+
+  if(isGlobalDef(args[0])) {
+    namedArgs.globalDefinitions = args[0];
+    args.shift();
+  }
+
+  if(args.length === 0) { return namedArgs; }
+
+  if(isReduxConfig(args[0])) {
+    namedArgs.reduxConfig = args[0];
+  }
+
+  return namedArgs;
+};
+
+/**
  * createStore converts the passed in redux and returns the store, selectors, and actions.
  * Also spits out console.error logs if a reducer config in modularReduxDefinition is invalid.
- * @param  {Object} modularReduxDefinition    The modular redux thunk config.
- * @param  {Object} [globalDefinitions={}]    Global selectors and actions.
- *                                            Allowed keys: [globalSelectors, globalActions]
- * @param  {Object} [reduxConfig={}]          Configuration you'd like passed to redux.
- *                                            Allowed keys: [reducers, middleware, enhancers]
- * @return {Object}                           Returns an object that contains the store,
- *                                            selectors, actions, and pickActions method.
+ * @param  {Object} modularReduxDefinition      The modular redux thunk config.
+ * @param  {Object} [preloadedState=undefined]  The initial state passed to Redux.
+ * @param  {Object} [globalDefinitions={}]      Global selectors and actions.
+ *                                              Allowed keys: [globalSelectors, globalActions]
+ * @param  {Object} [reduxConfig={}]            Configuration you'd like passed to redux.
+ *                                              Allowed keys: [reducers, middleware, enhancers]
+ * @return {Object}                             Returns an object that contains the store,
+ *                                              selectors, actions, and pickActions method.
  */
-const createStore = (modularReduxDefinition, globalDefinitions=null, reduxConfig=null) => {
+const createStore = (modularReduxDefinition, ...args) => {
 
   // Since both globalDefinitions and reduxConfig are optional, we need to figure out
   // if they only passed in globalDefinitions and it's really reduxConfig.
   // NOTE: This was moved to another function for easy testing.
-  ({ globalDefinitions, reduxConfig } = switchGlobalDefinitionsAndReduxConfig(globalDefinitions,reduxConfig));
+  const { preloadedState, globalDefinitions, reduxConfig } = createStoreArgsToNamedArgs(args);
 
   // Extract all the variables from the optional params.
   const { globalSelectors = {}, globalActions = {} } = (globalDefinitions || {});
@@ -117,7 +167,7 @@ const createStore = (modularReduxDefinition, globalDefinitions=null, reduxConfig
   }
 
   // Now create the store from the reducer,
-  const store = reduxCreateStore(rootModule.reducer, undefined, composedEnhancers);
+  const store = reduxCreateStore(rootModule.reducer, preloadedState, composedEnhancers);
 
   return { store, selectors, actions, pickActions };
 };

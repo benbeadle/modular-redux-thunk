@@ -1,4 +1,7 @@
 
+## v1.0.0-beta6
+* Added optional `preloadedState` argument to `createStore`.
+
 ## v1.0.0-beta5
 * Changed terminology to "modules" instead of "reducers" to encompass the idea of reducers, actions, and selectors.
 * Added new exported function `combineModules`.

@@ -213,13 +213,14 @@ A module object consists of:
 - `actions` (*object*): A map of action creator functions. Each action should return an object with, at the very least, a `type` property.
 - `selectors` (*object*): Selector functions that connected components call to get parts of the state. A selector's first and only argument is the module's current state.
 
-## `createStore(modules, [globalDefinitions], [reduxConfig])`
+## `createStore(modules, [preloadedState], [globalDefinitions], [reduxConfig])`
 
 Creates a Redux store that combines your reducers into a single and complete state tree.
 
 ### Arguments
 
 1. `modules` (*object*): Defines the global structure of the store. Each key represents the modules's location in the store, and the value is the module object itself. Module objects are described above.
+2. `[preloadedState]` (*object*): Initial state passed to Redux.
 2. `[globalDefinitions]` (*object*):  Pass in any global actions or selectors. Globals are given access to all reducers. You can pass in the following keys:
 	- `[globalActions]` (*object*):  Actions that can themselves perform actions from any reducer. Global actions differ from reducer actions in that the first argument will always be:
 		- `combinedActions` (*object*):  All combined actions from reducers. This allows you to reference reducer-defined actions.
@@ -259,6 +260,7 @@ Creates a module that controls a single value and responds to a single "set" act
 - Finish pending tests
 - Coveralls.io / Fix Istanbul (and status)
 - Minify build
+- JS:next?
 
 
 #### Releasing
